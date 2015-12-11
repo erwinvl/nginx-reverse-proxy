@@ -1,16 +1,16 @@
 # Pull base image.
-FROM FROM oraclelinux:latest
+FROM oraclelinux:latest
 
 # Copy 
 ADD ./rpm/ .
 
 # Install Nginx.
 RUN rpm -i nginx-release-rhel-7-0.el7.ngx.noarch.rpm \
- && yum -y install nginx \
- && chown -R www-data:www-data /var/lib/nginx
+ && rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm \
+ && yum -y install nginx uwsgi uwsgi-plugin-python 
 
 # Define mountable directories.
-VOLUME ["/etc/nginx/certs", "/var/log/nginx", "/var/www/html"]
+VOLUME ["/etc/nginx/certs", "/var/log/nginx"]
 
 # Define working directory.
 WORKDIR /etc/nginx
@@ -18,7 +18,7 @@ WORKDIR /etc/nginx
 # Copy all config files
 COPY config/default.conf /etc/nginx/conf.d/default.conf
 
-# Copy default webpage
-
+# Expose port 80
+EXPOSE 80
 # Define default command.
-CMD nginx
+CMD /usr/sbin/nginx -g "daemon off;"
